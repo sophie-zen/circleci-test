@@ -9,7 +9,7 @@ jobs:
     docker:
       - image: circleci/python
     steps:
-    　- checkout
+      - checkout
       - run:
           name: Run .sh for validation
           command: bash .circleci/simple_script.sh

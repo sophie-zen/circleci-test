@@ -12,10 +12,10 @@ jobs:
       - checkout
       - run:
           name: Run .sh for validation
-          command: bash .circleci/simple_script.sh
+          command: bash .circleci/simple_script.sh ./
 workflows:
   version: 2
   btd:
     jobs:
-    - build
+    # - build
     - test

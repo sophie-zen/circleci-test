@@ -17,9 +17,12 @@ LATEST_COMMIT=$(git rev-parse HEAD)
 # 4. Get the latest commit in the searched paths
 LATEST_COMMIT_IN_PATH=$(git log -1 --format=format:%H --full-diff $PATHS_TO_SEARCH)
 
-if [ $LATEST_COMMIT != $LATEST_COMMIT_IN_PATH ]; then
+printf $LATEST_COMMIT
+printf $LATEST_COMMIT_IN_PATH
+
+if [ $LATEST_COMMIT = $LATEST_COMMIT_IN_PATH ]; then
     echo "Exiting this CircleCI job because code in the following paths have not changed:"
     echo $PATHS_TO_SEARCH
-    # circleci step halt
-    exit 1
+    circleci step halt
+    # exit 1
 fi

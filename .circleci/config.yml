@@ -1,130 +1,21 @@
-version: 2.1
-orbs:
-  heroku: circleci/heroku@0.0.8
-executors:
-  macos_executor:
-    macos:
-      xcode: "10.2.0"
-  ubuntu_machine_executor:
-    machine:
-      image: circleci/classic:201808-01
-      docker_layer_caching: true
-  node_executor:
+version: 2
+jobs:
+  build:
     docker:
-      - image: circleci/node:11.1.0
-parameters:
-  macos:
-    type: boolean
-    default: false
-  ubuntu_machine:
-    type: boolean
-    default: false
-  build_and_deploy:
-    type: boolean
-    default: true
+      - image: circleci/python
+    steps:
+      - run: exit 0
+  test:
+    docker:
+      - image: circleci/python
+    steps:
+    　- checkout
+      - run:
+          name: Run .sh for validation
+          command: bash .circleci/simple_script.sh
 workflows:
   version: 2
-  macos:
-    # when: << pipeline.parameters.macos >>
+  btd:
     jobs:
-      - show_xcode_version:
-          context: test-context
-  ubuntu_machine:
-    # when: << pipeline.parameters.ubuntu_machine >>
-    jobs:
-      - show_ubuntu_whois
-  build_and_deploy:
-    # when: << pipeline.parameters.build_and_deploy >>
-    jobs:
-      - splitting-test
-      - build:
-          requires:
-            - splitting-test
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-jobs:
-  show_xcode_version:
-    executor: macos_executor
-    shell: /bin/bash --login -eo pipefail
-    steps:
-      - restore_cache:
-          key: homebrew
-      - attach_workspace:
-          at: ./
-      - run:
-          command: |
-            xcodebuild -version
-            echo ${password}
-      - run:
-          command: brew update
-      - run:
-          command: brew install Gradle
-  show_ubuntu_whois:
-    executor: ubuntu_machine_executor
-    environment:
-      - DOCKER_BUILDKIT: '1'
-    steps:
-      - checkout
-      - run:
-          command: |
-            echo "hello world"
-            echo "{ \"experimental\": true }"  | sudo tee /etc/docker/daemon.json
-            sudo service docker restart
-            docker version
-            docker build -t myimage .
-  splitting-test:
-    executor: node_executor
-    docker:
-      - image: circleci/node:11.1.0
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - run:
-          name: Run Jest test by splitting
-          command: |
-            npm install
-            TESTFILES=$(circleci tests glob "./src/*.test.js" | circleci tests split --split-by=timings)
-            echo ${TESTFILES}
-            npm run test ${TESTFILES}
-  build:
-    executor: node_executor
-    working_directory: ~/repo
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-      - run: npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - config/share_key
-      - store_test_results:
-          path: test_results
-      - run: npm run test
-
-  deploy:
-    docker:
-      - image: buildpack-deps:trusty
-    executor: heroku/default # Uses the basic buildpack-deps image, which has the prerequisites for installing heroku's CLI.
-    steps:
-      - checkout
-      # To test persist_to_workspace is actually working
-      - attach_workspace:
-          at: /tmp/workspace
-      # ...and see it's attached well
-      - run: ls /tmp/workspace
-      - heroku/install # Runs the heroku install command, if necessary.
-      - heroku/deploy-via-git: # Deploys branch to Heroku via git push.
-          only-branch: master # If you specify an only-branch, the deploy will not occur for any other branch.
+    - build
+    - test

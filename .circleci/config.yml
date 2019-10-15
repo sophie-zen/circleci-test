@@ -6,7 +6,10 @@ jobs:
     docker:
       - image: circleci/python
     steps:
-      - run: export TEST_VAR='hello'
+      - run:
+          command: |
+            export TEST_VAR='hello'
+            print $TEST_VAR
   test:
     docker:
       - image: circleci/python

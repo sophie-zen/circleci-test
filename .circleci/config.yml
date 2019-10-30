@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  orb-tools: circleci/orb-tools@volatile
 jobs:
   build:
     docker:
@@ -10,21 +8,8 @@ jobs:
           command: |
             export TEST_VAR='hello'
             print $TEST_VAR
-  test:
-    docker:
-      - image: circleci/python
-    steps:
-      - checkout
-      - run:
-          name: Run .sh for validation
-          command: |
-            print $TEST_VAR
-            # bash .circleci/simple_script.sh ./
 workflows:
   version: 2
   btd:
     jobs:
     - build
-    - test:
-        requires:
-          - build

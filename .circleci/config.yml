@@ -5,7 +5,10 @@ jobs:
       - image: circleci/node:latest
     steps:
       - checkout
-      - run: npm run test
+      - run:
+          command: |
+            npm i
+            npm run test
       - run:
           name: exit with 1
           command: |

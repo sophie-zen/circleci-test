@@ -6,8 +6,7 @@ jobs:
     steps:
       - run:
           command: |
-            export TEST_VAR='hello'
-            print $TEST_VAR
+            echo "hello"
 workflows:
   version: 2
   btd:

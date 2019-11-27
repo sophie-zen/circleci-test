@@ -5,6 +5,7 @@ jobs:
       - image: circleci/python
     steps:
       - checkout
+      - run: npm run test
       - run:
           name: exit with 1
           command: |

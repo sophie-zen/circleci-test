@@ -5,10 +5,6 @@ jobs:
       - image: circleci/python
     steps:
       - run:
+          name: exit with 1
           command: |
-            echo "hello"
-workflows:
-  version: 2
-  btd:
-    jobs:
-    - build
+            exit 1

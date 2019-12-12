@@ -7,6 +7,7 @@ setlocal
 set BUILDDIR=%~dp0
 set PATH=%BUILDDIR%.deps\go\bin;%BUILDDIR%.deps;%PATH%
 set PATHEXT=.exe
+set GO111MODULE=on
 cd /d %BUILDDIR% || exit /b 1
 
 if exist .deps\prepared goto :build

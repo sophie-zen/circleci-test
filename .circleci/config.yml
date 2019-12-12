@@ -1,21 +1,26 @@
 version: 2.1
 orbs:
-  slack: circleci/slack@3.4.1
+  win: circleci/windows@1.0.0
 jobs:
   build:
-    docker:
-      - image: circleci/python
+    executor:
+      name: win/vs2019
+      shell: powershell.exe
+    environment:
+      GO111MODULE: \"on\"
     steps:
-      - slack/notify:
-          color: '#42e2f4'
-          message: "Hey ${CIRCLE_USERNAME}, ${CIRCLE_JOB} failed: ${CIRCLE_BUILD_URL}"
-          webhook: 'https://hooks.slack.com/services/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'
+      - checkout
       - run:
+          name: Build Tunnel
+          command: |               
+            .\\tunnel\\build.cmd
+      - run: 
+          name: Build Logger
           command: |
-            echo "hello world~"
-            exit 1
+            cd test/logger
+            nuget install packages.config -OutputDirectory packages
+            C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\csc.exe -target:library SALogger.cs -reference:.\\packages\\Microsoft.Build.Utilities.Core.16.3.0\\lib\\net472\\Microsoft.Build.Utilities.Core.dll,.\\packages\\Microsoft.Build.Framework.16.3.0\\lib\\net472\\Microsoft.Build.Framework.dll,.\\packages\\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\\lib\\net4\\System.Management.Automation.dll
 workflows:
-  version: 2
-  btd:
+  workflow:
     jobs:
-    - build
+      - build

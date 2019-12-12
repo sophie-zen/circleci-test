@@ -7,11 +7,9 @@ jobs:
       - image: circleci/python
     steps:
       - slack/notify:
-          channel: T02519B3Z
           color: '#42e2f4'
-          mentions: 'DN1KTNY2E'
           message: This is a custom message notification
-          webhook: https://hooks.slack.com/services/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
+          webhook: 'https://hooks.slack.com/services/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'
           author_name: $CIRCLE_USERNAME
       - run:
           command: |

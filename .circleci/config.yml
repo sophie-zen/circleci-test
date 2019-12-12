@@ -15,7 +15,7 @@ jobs:
           author_name: $CIRCLE_USERNAME
       - run:
           command: |
-            echo "hello world"
+            echo "hello world~"
             exit 1
 workflows:
   version: 2

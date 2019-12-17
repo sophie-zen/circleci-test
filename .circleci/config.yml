@@ -1,21 +1,34 @@
 version: 2.1
-# What I want to be able to do is
-# call \\\"C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2017\\\\Enterprise\\\\Common7\\\\Tools\\\\VsDevCmd.bat\\\" -host_arch=amd64 -arch=amd64
-# Which works fine on azure pipelines and over ssh
+  jobs:
+    build:
+      docker:
+# specify the version you desire here
+        - image: circleci/node:12.7.0
+      working_directory: ~/repo
 
-orbs:
-  win: circleci/windows@2.2.0
+      steps:
+        - checkout
 
-jobs:
-  example-one:
-    executor:
-      name: win/default
-      size: xlarge
-    steps:
-      - checkout
+        # Download and cache dependencies
+        - restore_cache:
+            keys:
+              - v1-dependencies-{{ checksum "package.json" }}
+              # fallback to using the latest cache if no exact match is found
+              - v1-dependencies-
 
-workflows:
-  version: 2
-  build_and_test_all:
-    jobs:
-      - example-one
+        - run: yarn install
+
+        - save_cache:
+            paths:
+              - node_modules
+            key: v1-dependencies-{{ checksum "package.json" }}
+
+# run tests!
+        - run:
+          command:
+            yarn test
+
+        - run:
+        name: Create Release
+        command: yarn semantic-release
+        
